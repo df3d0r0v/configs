@@ -1,3 +1,3 @@
-## configs for
-	vim
-	CLion
+## configs for programs
+	- vim
+	- CLion
