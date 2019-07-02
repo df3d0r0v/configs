@@ -6,6 +6,7 @@ filetype off
 set rtp+=~/.vim/bundle/Vundle.vim
 call vundle#begin()
 
+Plugin 'morhetz/gruvbox'
 Plugin 'VundleVim/Vundle.vim'
 Plugin 'tpope/vim-fugitive'
 Plugin 'git://git.wincent.com/command-t.git'
@@ -20,6 +21,9 @@ Plugin 'https://github.com/dfedorov-dev/stdheader.git'
 
 call vundle#end()   
 filetype plugin indent on
+
+set background=dark
+colorscheme gruvbox
 
 " Shortcut to open NERDTree
  

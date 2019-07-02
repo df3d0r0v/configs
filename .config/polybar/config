@@ -6,8 +6,9 @@ height = 20
 background = #333333
 foreground = #EBDBB2
 
-line-size = 16
-line-color = #000000
+line-size = 2
+border-bottom-size = 3
+border-color = #333333
 
 spacing = 0
 padding-right = 1
@@ -18,8 +19,9 @@ font-1 = Hack Nerd Font:style=Regular:size=12;2
 
 enable-ipc = true
 
-modules-left = powermenu
-modules-right = keyboard pulseaudio backlight wireless-network wired-network battery date
+modules-left = powermenu spotify playpause
+modules-center = date
+modules-right = keyboard backlight pulseaudio wireless-network ip battery
 
 [bar/bottom]
 monitor = eDP1
@@ -34,27 +36,30 @@ line-color = ${bar/top.background}
 line-size = 2
 
 spacing = 1
-padding-right = 2
-module-margin-left = 0
-module-margin-right = 6
+padding-right = 1
+module-margin = 2
 
 font-0 = Hack:style=Regular:size=10;2
-font-1 = Hack Nerd Font:style=Regular:size=12;-3
+font-1 = Hack Nerd Font:style=Regular:size=10;2
 
-modules-left = ewmh
-modules-right = cpu memory
+modules-left = i3
+modules-right = cpu temperature memory filesystem 
 
 [module/keyboard]
 type = internal/xkeyboard
+format = <label-layout>
 blacklist-0 = num lock
-blacklist-1 = scroll lock<Paste>
+blacklist-1 = scroll lock
+format-underline = #CC241D
+
 
 [module/backlight]
 type = internal/xbacklight
 card = intel_backlight
-format = <ramp> <bar>
+format = <label>
+format-underline = #D79921
 
-label = %percentage%%
+label =  %percentage%%
 
 ramp-0 = 
 ramp-1 = 
@@ -62,7 +67,7 @@ ramp-2 = 
 ramp-3 = 
 ramp-4 = 
 
-
+; Only applies if <bar> is used
 bar-width = 11
 bar-indicator = |
 bar-indicator-font = 3
@@ -84,8 +89,11 @@ adapter = AC
 poll-interval = 5
 
 format-charging = <animation-charging> <label-charging>
+format-charging-underline = #D79921
 format-discharging = <ramp-capacity> <label-discharging>
+format-discharging-underline = #B16286
 format-full = <ramp-capacity> <label-full>
+format-full-underline = #98971A
 
 ramp-capacity-0 = 
 ramp-capacity-0-foreground = #ffa900
@@ -113,9 +121,10 @@ animation-charging-framerate = 750
 
 [module/cpu]
 type = internal/cpu
-interval = 0.5
-format = <label> <ramp-coreload>
-label = CPU
+interval = 1
+format = <label>
+label =  %percentage-cores%
+format-underline = #458588
 
 ramp-coreload-0 = ▁
 ramp-coreload-0-font = 2
@@ -144,13 +153,15 @@ ramp-coreload-7-foreground = #ff5555
 
 [module/date]
 type = internal/date
-date =  %%{F#99}%Y-%m-%d%%{F-} %%{F#fff}%H:%M%%{F-}
-date-alt = %%{F#fff}%A, %d %B %Y %%{F#fff}%H:%M%%{F#666}:%%{F#fba922}%S%%{F-}
+date = %%{F#ebdbb2}%Y-%m-%d%%{F-} %%{F#ebdbb2}%H:%M%%{F-}
+date-alt = %%{F#ebdbb2}%A, %d %B %Y %%{F#enbdbb2}%H:%M%%{F#ebdbb2}%%{F-}
+format-underline = #98971A
 
 [module/memory]
 type = internal/memory
-format = <label> <bar-used>
-label = RAM
+format = <label>
+label =  %gb_used%/%gb_total%
+format-underline = #D79921
 
 bar-used-width = 30
 bar-used-foreground-0 = #689D6A
@@ -163,8 +174,60 @@ bar-used-indicator-foreground = #ff
 bar-used-fill = ─
 bar-used-fill-font = 6
 bar-used-empty = ─
-bar-used-empty-font = 6
+bar-used-empty-font = 0
 bar-used-empty-foreground = #444444
+
+[module/temperature]
+type = internal/temperature
+
+format = <ramp><label>
+format-underline = #B16286
+; Seconds to sleep between updates
+; Default: 1
+interval = 1
+
+; Thermal zone to use
+; To list all the zone types, run 
+; $ for i in /sys/class/thermal/thermal_zone*; do echo "$i: $(<$i/type)"; done
+; Default: 0
+thermal-zone = 2
+
+; Full path of temperature sysfs path
+; Use `sensors` to find preferred temperature source, then run
+; $ for i in /sys/class/hwmon/hwmon*/temp*_input; do echo "$(<$(dirname $i)/name): $(cat ${i%_*}_label 2>/dev/null || echo $(basename ${i%_*})) $(readlink -f $i)"; done
+; to find path to desired file
+; Default reverts to thermal zone setting
+hwmon-path = /sys/devices/platform/coretemp.0/hwmon/hwmon3/temp1_input
+
+; Threshold temperature to display warning label (in degrees celsius)
+; Default: 80
+warn-temperature = 60
+label-warn =  %temperature-c%
+label-warn-foreground = #CC241D
+
+ramp-0 = 
+ramp-1 = 
+ramp-2 = 
+
+[module/filesystem]
+type = internal/fs
+format-mounted-underline = #98971A
+label-mounted = %mountpoint%: %free%
+; Mountpoints to display
+mount-0 = /
+mount-1 = /home
+
+; Seconds to sleep between updates
+; Default: 30
+interval = 60
+
+; Display fixed precision values
+; Default: false
+fixed-values = true
+
+; Spacing between entries
+; Default: 2
+spacing = 2
 
 [module/wireless-network]
 type = internal/network
@@ -173,8 +236,10 @@ interval = 3.0
 ping-interval = 10
 
 format-connected = <ramp-signal> <label-connected>
-label-connected = %essid%
+format-connected-underline = #689D6A
+label-connected =  %essid%
 label-disconnected = 睊 not connected
+format-disconnected-underline = #D79921
 label-disconnected-foreground = #66
 
 ramp-signal-0 = 
@@ -189,11 +254,18 @@ animation-packetloss-1 = 
 animation-packetloss-1-foreground = ${bar/top.foreground}
 animation-packetloss-framerate = 500
 
+[module/ip]
+type = custom/script
+exec = echo " $(wget -qO- eth0.me)"
+format-underline = #458588
+interval = 90
+
 [module/wired-network]
 type = internal/network
 interface = enp0s31f6
 interval = 3.0
 
+format-connected-underline = #458588
 label-connected =  %{T3}%local_ip%%{T-}
 label-disconnected-foreground = #66
 
@@ -204,7 +276,9 @@ use-ui-max = true
 interval = 5
 
 format-volume = <ramp-volume> <label-volume>
+format-volume-underline = #458588
 label-muted =  muted
+format-muted-underline = #CC241D
 label-muted-foreground = #66
 
 ramp-volume-0 = 
@@ -215,10 +289,10 @@ ramp-volume-3 = 
 [module/powermenu]
 type = custom/menu
 
-format-padding = 1
+format-underline = #CC241D
 
-label-open = 
-label-close = 
+label-open = "  "
+label-close = "  "
 
 menu-0-0 = "  "  
 menu-0-0-foreground = #EBDBB2
@@ -233,13 +307,48 @@ menu-0-3 = "  "
 menu-0-3-foreground = #EBDBB2
 menu-0-3-exec = poweroff
 
-[module/clock]
-type = internal/date
-interval = 2
-date = %%{F#999}%Y-%m-%d%%{F-}  %%{F#fff}%H:%M%%{F-}
+[module/i3]
+type = internal/i3
 
-[module/ewmh]
-type = internal/xworkspaces
+; Only show workspaces defined on the same output as the bar
+;
+; Useful if you want to show monitor specific workspaces
+; on different bars
+;
+; Default: false
+pin-workspaces = true
+
+; This will split the workspace name on ':'
+; Default: false
+strip-wsnumbers = true
+
+; Sort the workspaces by index instead of the default
+; sorting that groups the workspaces by output
+; Default: false
+index-sort = true
+
+; Create click handler used to focus workspace
+; Default: true
+enable-click = true
+
+; Create scroll handlers used to cycle workspaces
+; Default: true
+enable-scroll = true
+
+; Wrap around when reaching the first/last workspace
+; Default: true
+wrapping-scroll = true
+
+; Set the scroll cycle direction 
+; Default: true
+reverse-scroll = true
+
+; Use fuzzy (partial) matching on labels when assigning 
+; icons to workspaces
+; Example: code;♚ will apply the icon to all workspaces 
+; containing 'code' in the label
+; Default: false
+fuzzy-match = true
 
 [module/previous]
 type = custom/script

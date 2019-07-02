@@ -27,7 +27,7 @@ bindsym $mod+Return exec i3-sensible-terminal
 bindsym $mod+Shift+q kill
 
 # start rofi (a program launcher)
-set $execute exec rofi -config ~/.config/rofi/gruvbox.rasi -show drun
+set $execute exec rofi -show drun
 bindsym Control+space $execute
 bindsym XF86Search $execute
 
@@ -207,9 +207,9 @@ default_border pixel 1
 
 # green gruvbox
 # class                 border		backgr		text		indicator	child_border
-client.focused          $yellow		$yellow		$bg			$aqua		$yellow
-client.focused_inactive $bg0_h		$bg			$yellow 	$aqua		$bg0_h	
-client.unfocused        $bg0_h		$bg			$yellow 	$aqua		$bg0_h	
+client.focused          $aqua		$aqua		$bg			$blue		$aqua
+client.focused_inactive $bg0_h		$bg			$aqua 		$blue		$bg0_h	
+client.unfocused        $bg0_h		$bg			$aqua 		$blue		$bg0_h	
 client.urgent           $red		$red		$fg			$red		$red
 
 ################################################################################
